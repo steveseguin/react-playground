@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>React Playground</title>
-    <!-- Core React -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.1/tailwind.min.js"></script>
-    
-    <!-- CodeMirror -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
@@ -19,11 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/jsx/jsx.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
-    
-    <!-- Recharts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.2/Recharts.js"></script>
-    
-    <!-- Additional libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     
     <style>
@@ -55,7 +46,6 @@
             display: flex;
             gap: 12px;
             align-items: center;
-            z-index: 1000;
         }
 
         .content {
@@ -70,13 +60,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            box-sizing: border-box;
             padding: 20px;
             margin: 0;
             transition: transform 0.3s ease;
             background: var(--bg-primary);
             overflow: auto;
-            transform: translateZ(0);
         }
 
         .code-container {
@@ -86,36 +74,12 @@
             width: 100%;
             height: 100%;
             transition: transform 0.3s ease;
-            transform: translateZ(0);  /* Force GPU acceleration */
         }
 
         .CodeMirror {
             height: 100% !important;
             font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
-            cursor: text;
-            max-height: none;
-            overflow-y: auto;
-        }
-        
-        .CodeMirror-scroll {
-            min-height: 100%;
-            max-height: none;
-            overflow-y: auto !important;
-            overflow-x: auto !important;
-        }
-
-        .CodeMirror-lines {
-            cursor: text;
-            padding: 8px 0;
-        }
-        
-        .CodeMirror pre.CodeMirror-line {
-            padding: 0 8px;
-        }
-        
-        .CodeMirror.cm-s-dracula {
-            border: 1px solid var(--border);
         }
 
         .hidden {
@@ -169,61 +133,29 @@
     </style>
     
     <script>
-        // Mock shadcn/ui components
         window.componentsUI = {
             Card: ({children, className=""}) => 
                 React.createElement('div', {
                     className: `bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`
                 }, children),
-            
             CardContent: ({children, className=""}) =>
                 React.createElement('div', {
                     className: `p-6 ${className}`
                 }, children),
-
             Button: ({children, onClick, className="", variant="default", size="default", disabled=false}) =>
                 React.createElement('button', {
                     onClick,
                     disabled,
-                    className: `inline-flex items-center justify-center rounded-md font-medium transition-colors
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none
-                        ${variant === 'destructive' ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-primary text-primary-foreground hover:bg-primary/90'}
-                        ${size === 'sm' ? 'h-8 px-3 text-xs' : 'h-10 px-4 py-2'} ${className}`
+                    className: `inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none ${variant === 'destructive' ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-primary text-primary-foreground hover:bg-primary/90'} ${size === 'sm' ? 'h-8 px-3 text-xs' : 'h-10 px-4 py-2'} ${className}`
                 }, children),
-
             Input: ({type="text", value, onChange, className="", disabled=false}) =>
                 React.createElement('input', {
                     type,
                     value,
                     onChange,
                     disabled,
-                    className: `flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm
-                        file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`
-                }),
-
-            Alert: ({children, variant="default", className=""}) =>
-                React.createElement('div', {
-                    className: `relative w-full rounded-lg border p-4 ${variant === 'destructive' ? 'border-red-500/50 text-red-500' : 'border-gray-200'} ${className}`
-                }, children),
-
-            AlertDescription: ({children}) =>
-                React.createElement('div', {
-                    className: "text-sm [&_p]:leading-relaxed"
-                }, children),
-
-            Select: ({value, onValueChange, children}) =>
-                React.createElement('select', {
-                    value,
-                    onChange: (e) => onValueChange(e.target.value),
-                    className: "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                }, children),
-
-            SelectTrigger: ({children}) => children,
-            SelectValue: () => null,
-            SelectContent: ({children}) => children,
-            SelectItem: ({value, children}) =>
-                React.createElement('option', { value }, children)
+                    className: `flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`
+                })
         };
     </script>
 </head>
@@ -235,7 +167,7 @@
     <div class="content">
         <div id="code-container" class="code-container">
             <textarea id="code">// Custom components are available under componentsUI
-const { Card, CardContent, Button, Input, Alert, AlertDescription, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } = window.componentsUI;
+const { Card, CardContent, Button, Input } = window.componentsUI;
 
 function App() {
   const [count, setCount] = React.useState(0);
@@ -265,7 +197,6 @@ function App() {
         const codeContainer = document.getElementById('code-container');
         const errorDisplay = document.getElementById('error');
 
-        // Initialize CodeMirror
         const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
             mode: 'jsx',
             theme: 'dracula',
@@ -275,9 +206,9 @@ function App() {
             indentUnit: 2,
             tabSize: 2,
             lineWrapping: true,
-            autofocus: true,    
-            dragDrop: true,    
-            scrollbarStyle: 'native',
+            autofocus: true,
+            dragDrop: true,
+            scrollbarStyle: null,
             viewportMargin: Infinity,
             extraKeys: {
                 'Tab': (cm) => {
@@ -286,7 +217,20 @@ function App() {
                     } else {
                         cm.replaceSelection('  ', 'end');
                     }
-                }
+                },
+                'Ctrl-V': false,
+                'Cmd-V': false
+            },
+            pasteLimitedElements: false,
+            allowDropFileTypes: ['text/plain', 'text/javascript', 'application/javascript'],
+            value: document.getElementById('code').value
+        });
+
+        editor.on('paste', (cm, e) => {
+            if (e.clipboardData) {
+                e.preventDefault();
+                const text = e.clipboardData.getData('text/plain');
+                cm.replaceSelection(text);
             }
         });
 
@@ -295,7 +239,6 @@ function App() {
             preview.classList.toggle('hidden');
             codeContainer.classList.toggle('hidden');
             if (isShowingPreview) runCode();
-            if (!isShowingPreview) editor.refresh();
         }
 
         function runCode() {
@@ -326,8 +269,6 @@ function App() {
             }
         }
 
-        // Initial run
-        editor.setValue(document.getElementById('code').value);
         toggleView();
     </script>
 </body>
