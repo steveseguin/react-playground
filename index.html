@@ -6,6 +6,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/jsx/jsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
     <style>
         :root {
             --bg-primary: #1a1a1a;
@@ -43,7 +50,7 @@
             overflow: hidden;
         }
 
-        textarea, .preview { 
+        .preview { 
             position: absolute;
             top: 0;
             left: 0;
@@ -53,22 +60,23 @@
             padding: 20px;
             margin: 0;
             transition: transform 0.3s ease;
-        }
-
-        textarea {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
-            font-size: 14px;
-            border: none;
-            resize: none;
-            tab-size: 2;
-            outline: none;
-        }
-
-        .preview {
             background: var(--bg-primary);
             overflow: auto;
+        }
+
+        .code-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
         }
 
         .hidden {
@@ -127,7 +135,8 @@
         <button class="toggle-btn" onclick="toggleView()">Toggle View</button>
     </div>
     <div class="content">
-        <textarea id="code" spellcheck="false">// Example React Component
+        <div id="code-container" class="code-container">
+            <textarea id="code">// Example React Component
 function App() {
   const [count, setCount] = React.useState(0);
   
@@ -150,6 +159,7 @@ function App() {
     </div>
   );
 }</textarea>
+        </div>
         <div id="preview" class="preview hidden"></div>
     </div>
     <div id="error" class="error"></div>
@@ -157,18 +167,40 @@ function App() {
     <script>
         let isShowingPreview = false;
         const preview = document.getElementById('preview');
-        const codeEditor = document.getElementById('code');
+        const codeContainer = document.getElementById('code-container');
         const errorDisplay = document.getElementById('error');
+
+        // Initialize CodeMirror
+        const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+            mode: 'jsx',
+            theme: 'dracula',
+            lineNumbers: true,
+            matchBrackets: true,
+            autoCloseBrackets: true,
+            indentUnit: 2,
+            tabSize: 2,
+            lineWrapping: true,
+            extraKeys: {
+                'Tab': (cm) => {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection('add');
+                    } else {
+                        cm.replaceSelection('  ', 'end');
+                    }
+                }
+            }
+        });
 
         function toggleView() {
             isShowingPreview = !isShowingPreview;
             preview.classList.toggle('hidden');
-            codeEditor.classList.toggle('hidden');
+            codeContainer.classList.toggle('hidden');
             if (isShowingPreview) runCode();
+            if (!isShowingPreview) editor.refresh();
         }
 
         function runCode() {
-            const code = codeEditor.value;
+            const code = editor.getValue();
             errorDisplay.textContent = '';
             errorDisplay.classList.remove('visible');
             preview.innerHTML = '<div id="root"></div>';
