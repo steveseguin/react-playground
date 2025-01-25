@@ -101,13 +101,47 @@
             background: var(--accent-hover);
         }
 
-        .toggle-btn {
+        .toggle-switch {
+            position: relative;
+            display: inline-flex;
             background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 4px;
             border: 1px solid var(--border);
+            user-select: none;
         }
 
-        .toggle-btn:hover {
-            background: var(--border);
+        .toggle-switch input[type="radio"] {
+            display: none;
+        }
+
+        .toggle-switch label {
+            position: relative;
+            z-index: 1;
+            padding: 6px 16px;
+            cursor: pointer;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: var(--accent);
+            border-radius: 20px;
+            transition: transform 0.3s ease;
+            height: calc(100% - 8px);
+            width: calc(50% - 4px);
+        }
+
+        .toggle-switch input[value="preview"]:checked ~ .slider {
+            transform: translateX(100%);
+        }
+
+        .toggle-switch input:checked + label {
+            color: var(--text-primary);
         }
 
         .error { 
@@ -162,7 +196,13 @@
 <body>
     <div class="header">
         <button onclick="runCode()">Run</button>
-        <button class="toggle-btn" onclick="toggleView()">Toggle View</button>
+        <div class="toggle-switch">
+            <input type="radio" id="codeView" name="view" value="code" checked>
+            <label for="codeView">Code</label>
+            <input type="radio" id="previewView" name="view" value="preview">
+            <label for="previewView">Preview</label>
+            <span class="slider"></span>
+        </div>
     </div>
     <div class="content">
         <div id="code-container" class="code-container">
@@ -234,12 +274,14 @@ function App() {
             }
         });
 
-        function toggleView() {
-            isShowingPreview = !isShowingPreview;
-            preview.classList.toggle('hidden');
-            codeContainer.classList.toggle('hidden');
-            if (isShowingPreview) runCode();
-        }
+        document.querySelectorAll('.toggle-switch input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                isShowingPreview = this.value === 'preview';
+                preview.classList.toggle('hidden', !isShowingPreview);
+                codeContainer.classList.toggle('hidden', isShowingPreview);
+                if (isShowingPreview) runCode();
+            });
+        });
 
         function runCode() {
             const code = editor.getValue();
