@@ -18,14 +18,206 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     
     <style>
-        /* Keep existing styles */
-        [Previous styles remain exactly the same...]
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --error: #ff5555;
+            --border: #404040;
+        }
+
+        body { 
+            margin: 0; 
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: system-ui;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview { 
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            margin: 0;
+            transition: transform 0.3s ease;
+            background: var(--bg-primary);
+            overflow: auto;
+        }
+
+        .code-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            cursor: text;
+        }
+
+        .CodeMirror-lines {
+            cursor: text;
+        }
+
+        .CodeMirror pre.CodeMirror-line,
+        .CodeMirror pre.CodeMirror-line-like {
+            cursor: text;
+        }
+
+        .CodeMirror-cursors {
+            cursor: text;
+        }
+
+        .CodeMirror-selected {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .CodeMirror-line::selection,
+        .CodeMirror-line > span::selection,
+        .CodeMirror-line > span > span::selection {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .CodeMirror.cm-s-dracula {
+            border: 1px solid var(--border);
+        }
+
+        .hidden {
+            transform: translateX(100%);
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: var(--accent);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        button:hover { 
+            background: var(--accent-hover);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-flex;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 4px;
+            border: 1px solid var(--border);
+            user-select: none;
+        }
+
+        .toggle-switch input[type="radio"] {
+            display: none;
+        }
+
+        .toggle-switch label {
+            position: relative;
+            z-index: 1;
+            padding: 6px 16px;
+            cursor: pointer;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: var(--accent);
+            border-radius: 20px;
+            transition: transform 0.3s ease;
+            height: calc(100% - 8px);
+            width: calc(50% - 4px);
+        }
+
+        .toggle-switch input[value="preview"]:checked ~ .slider {
+            transform: translateX(100%);
+        }
+
+        .toggle-switch input:checked + label {
+            color: var(--text-primary);
+        }
+
+        .error { 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            color: var(--error);
+            background: rgba(26, 26, 26, 0.95);
+            margin: 0;
+            padding: 12px 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            border-top: 1px solid var(--border);
+            max-height: 30vh;
+            overflow: auto;
+            display: none;
+        }
+
+        .error.visible {
+            display: block;
+        }
     </style>
     
     <script>
         window.componentsUI = {
-            /* Keep existing component definitions */
-            [Previous componentsUI definitions remain exactly the same...]
+            Card: ({children, className=""}) => 
+                React.createElement('div', {
+                    className: `bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`
+                }, children),
+            CardContent: ({children, className=""}) =>
+                React.createElement('div', {
+                    className: `p-6 ${className}`
+                }, children),
+            Button: ({children, onClick, className="", variant="default", size="default", disabled=false}) =>
+                React.createElement('button', {
+                    onClick,
+                    disabled,
+                    className: `inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none ${variant === 'destructive' ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-primary text-primary-foreground hover:bg-primary/90'} ${size === 'sm' ? 'h-8 px-3 text-xs' : 'h-10 px-4 py-2'} ${className}`
+                }, children),
+            Input: ({type="text", value, onChange, className="", disabled=false}) =>
+                React.createElement('input', {
+                    type,
+                    value,
+                    onChange,
+                    disabled,
+                    className: `flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`
+                })
         };
     </script>
 </head>
