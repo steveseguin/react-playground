@@ -80,6 +80,34 @@
             height: 100% !important;
             font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
+            cursor: text;
+        }
+
+        .CodeMirror-lines {
+            cursor: text;
+        }
+
+        .CodeMirror pre.CodeMirror-line,
+        .CodeMirror pre.CodeMirror-line-like {
+            cursor: text;
+        }
+
+        .CodeMirror-cursors {
+            cursor: text;
+        }
+
+        .CodeMirror-selected {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .CodeMirror-line::selection,
+        .CodeMirror-line > span::selection,
+        .CodeMirror-line > span > span::selection {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .CodeMirror.cm-s-dracula {
+            border: 1px solid var(--border);
         }
 
         .hidden {
