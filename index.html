@@ -76,24 +76,12 @@
             transition: transform 0.3s ease;
         }
 
-        .CodeMirror {
+       .CodeMirror {
             height: 100% !important;
             font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
             font-size: 14px;
-            cursor: text;
-        }
-
-        .CodeMirror-lines {
-            cursor: text;
-        }
-
-        .CodeMirror pre.CodeMirror-line,
-        .CodeMirror pre.CodeMirror-line-like {
-            cursor: text;
-        }
-
-        .CodeMirror-cursors {
-            cursor: text;
+            width: 100%;
+            position: absolute;
         }
 
         .CodeMirror-selected {
@@ -275,7 +263,7 @@ function App() {
             tabSize: 2,
             lineWrapping: true,
             autofocus: true,
-            dragDrop: false,
+            dragDrop: true, // Enable drag and drop
             scrollbarStyle: null,
             viewportMargin: Infinity,
             extraKeys: {
@@ -287,19 +275,6 @@ function App() {
                     }
                 }
             }
-        });
-
-        editor.on('paste', (cm, e) => {
-            if (e.clipboardData) {
-                e.preventDefault();
-                const text = e.clipboardData.getData('text/plain');
-                cm.replaceSelection(text);
-            }
-        });
-
-        editor.on('drop', (cm, e) => {
-            e.preventDefault();
-            return false;
         });
 
         document.querySelectorAll('.toggle-switch input[type="radio"]').forEach(radio => {
