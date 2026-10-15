@@ -72,6 +72,13 @@ Feel free to open issues and submit PRs for:
 - UI improvements
 - Documentation updates
 
+## Tests
+
+Run `node --test tests/rerun.test.cjs` with Node.js 18 or newer. These
+dependency-free regression tests exercise repeated execution in a persistent
+JavaScript context with DOM, Babel, and React doubles; they do not replace a
+full browser integration test.
+
 ## License
 
 MIT License - See LICENSE file for details

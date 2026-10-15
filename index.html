@@ -301,9 +301,11 @@ function App() {
                 const scriptElement = document.createElement('script');
                 scriptElement.type = 'text/javascript';
                 scriptElement.textContent = `
-                    ${transformedCode}
-                    const root = ReactDOM.createRoot(document.getElementById('root'));
-                    root.render(React.createElement(App));
+                    (() => {
+                        ${transformedCode}
+                        const root = ReactDOM.createRoot(document.getElementById('root'));
+                        root.render(React.createElement(App));
+                    })();
                 `;
 
                 document.body.appendChild(scriptElement);
